@@ -13,7 +13,16 @@ import logger from "morgan"
 import path from "path"
 
 const port = process.env.PORT || 5000;
-connectDB();
+
+const connectToDatabase = async () => {
+  try {
+    await connectDB();
+    console.log("MongoDB connected successfully.");
+  } catch (error) {
+    console.error("MongoDB connection failed:", error.message);
+  }
+};
+
 const app = express();
 
 app.use(
@@ -48,4 +57,7 @@ app.get("/", (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(port, () => console.log(`Server started on port ${port}`));
+app.listen(port, async () => {
+  console.log(`Server started on port ${port}`);
+  await connectToDatabase();
+})
