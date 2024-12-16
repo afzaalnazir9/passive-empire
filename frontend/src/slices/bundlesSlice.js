@@ -1,6 +1,6 @@
 import { apiSlice } from "./apiSlice";
 
-const BUNDLES_URL = "/api/bundles";
+const BUNDLES_URL = "/bundles";
 
 const bundleApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({

@@ -56,8 +56,8 @@ class PaytabsController {
             const shipping_address = customer_details;
 
             let backendUrl = process.env.BACKEND_URL;
-            let url_response = `${backendUrl}/api/payment/response`;
-            let url_callback = `${backendUrl}/api/payment/callback`;
+            let url_response = `${backendUrl}/payment/response`;
+            let url_callback = `${backendUrl}/payment/callback`;
 
             const response_url = [url_response, url_callback];
 

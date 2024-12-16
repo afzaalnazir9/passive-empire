@@ -31,17 +31,17 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.use("/api/users", userRoutes);
-app.use("/api/payment", paymentRoutes);
-app.use("/api/games", gamesRoutes)
-app.use("/api/bundles", bundleRoutes)
-app.get("/api/config", (req, res) => {
+app.use("/users", userRoutes);
+app.use("/payment", paymentRoutes);
+app.use("/games", gamesRoutes)
+app.use("/bundles", bundleRoutes)
+app.get("/config", (req, res) => {
   res.send({
     publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
   });
 });
 
-app.get("/api", (req, res) => {
+app.get("/", (req, res) => {
   res.send("API is running....");
 });
 

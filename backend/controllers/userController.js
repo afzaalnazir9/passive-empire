@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 
 
 // @desc    Auth user & get token
-// @route   POST /api/users/auth
+// @route   POST /users/auth
 // @access  Public
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -64,7 +64,7 @@ const Token = asyncHandler(async (req, res) => {
   }
 });
 // @desc    Register a new user
-// @route   POST /api/users/register
+// @route   POST /users/register
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -108,7 +108,7 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 // @desc    Logout user / clear cookie
-// @route   POST /api/users/logout
+// @route   POST /users/logout
 // @access  Public
 const logoutUser = (req, res) => {
   res.cookie("jwt", "", {
@@ -119,7 +119,7 @@ const logoutUser = (req, res) => {
 };
 
 // @desc    POST user profile
-// @route   POST /api/users/profile
+// @route   POST /users/profile
 // @access  Private
 const getUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.body.userId);
@@ -138,7 +138,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 });
 
 // @desc    Update user profile
-// @route   PATCH /api/users/profile
+// @route   PATCH /users/profile
 // @access  Private
 const updateUserProfile = asyncHandler(async (req, res) => {
   const { userId, password } = req.body;
@@ -162,7 +162,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 });
 
 // @desc    forget password
-// @route   POST /api/users/forget-password
+// @route   POST /users/forget-password
 // @access  Public
 const forgetPassword = asyncHandler(async (req, res) => {
   // const {Resend_API} = process.env;
@@ -201,7 +201,7 @@ const forgetPassword = asyncHandler(async (req, res) => {
 });
 
 // @desc    reset password
-// @route   POST /api/users/reset-password
+// @route   POST /users/reset-password
 // @access  Public
 const resetPassword = asyncHandler(async (req, res) => {
   const { password, token } = req.body;

@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { apiSlice } from "./apiSlice";
 
-const GAMES_URL = "/api/games";
+const GAMES_URL = "/games";
 
 const initialState = {
     selectedGame: {},
