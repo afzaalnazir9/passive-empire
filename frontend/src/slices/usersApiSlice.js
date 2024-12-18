@@ -1,9 +1,9 @@
 import { apiSlice } from "./apiSlice";
 
 const USERS_URL = "/users";
-const Payment_URL="/payment"
+const Payment_URL = "/payment"
 
- const userApiSlice = apiSlice.injectEndpoints({
+const userApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (data) => ({
@@ -86,6 +86,13 @@ const Payment_URL="/payment"
         body: data,
       }),
     }),
+    emailVerificationWithToken: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/verifyEmailWithToken`,
+        method: "PUT",
+        body: data
+      })
+    })
   }),
 });
 
@@ -101,5 +108,6 @@ export const {
   useGetPriceMutation,
   useCreateSubscriptionMutation,
   useCancelSubscriptionMutation,
-  useUpdateSubscriptionMutation
+  useUpdateSubscriptionMutation,
+  useEmailVerificationWithTokenMutation
 } = userApiSlice;

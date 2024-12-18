@@ -4,33 +4,62 @@ import generateToken from "../utils/generateToken.js";
 import { decodeToken, encodeToken } from "../utils/jwtToken.js";
 import { Resend } from "resend";
 import mongoose from "mongoose";
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
+
+const JWT_TOKEN = (userId) => {
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '1d' });
+};
 
 // @desc    Auth user & get token
 // @route   POST /users/auth
 // @access  Public
 const authUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { name, password } = req.body;
 
-  const user = await User.findOne({ email });
-  if (user && (await user.matchPassword(password))) {
-    generateToken(res, user._id);
+  try {
+    const user = await User.findOne({ name });
 
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      bundles: user.bundles,
-      totalCoins: user.coins
-    });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-  } else {
-    res.status(401).json({
-      message: "Invalid email or password",
-    });
-    throw new Error("Invalid email or password");
+    const isPasswordValid = await user.matchPassword(password);
+
+    if (isPasswordValid) {
+      if (user.role === "general") {
+        generateToken(res, user._id);
+        return res.json({
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          bundles: user.bundles,
+          totalCoins: user.coins,
+          userType: user.role,
+        });
+      } else if (user.role === "fellow" && user.isVerified) {
+        generateToken(res, user._id);
+        return res.json({
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          bundles: user.bundles,
+          totalCoins: user.coins,
+          userType: user.role,
+        });
+      } else {
+        return res.status(400).json({ message: "Please verify your email first" });
+      }
+    } else {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 });
+
+
 
 const loginUrl = asyncHandler(async (req, res) => {
   const { token } = req.body;
@@ -67,45 +96,184 @@ const Token = asyncHandler(async (req, res) => {
 // @route   POST /users/register
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
-  console.log(name, email)
+  const { name, email, password, userType } = req.body;
 
-  const existingUser = await User.findOne({ $or: [{ name }, { email }] });
-  console.log("existingUser :>> ", existingUser)
-  if (existingUser) {
-    if (existingUser.name === name && existingUser.email === email) {
-      res.status(400);
-      throw new Error("User with this name and email already exists");
-    } else if (existingUser.name === name) {
-      res.status(400);
-      throw new Error("User with this name already exists");
-    } else {
-      res.status(400);
-      throw new Error("User with this email already exists");
+  if (!userType || !['general', 'fellow'].includes(userType)) {
+    return res.status(400).json({ message: "Invalid user type" });
+  }
+
+  const existingUserByName = await User.findOne({ name });
+  if (existingUserByName) {
+    return res.status(400).json({ message: "Username is already taken" });
+  }
+
+  if (userType === 'fellow' && !email) {
+    return res.status(400).json({ message: "Email is required for fellow users" });
+  }
+
+  if (userType === 'fellow') {
+    const existingUserByEmail = await User.findOne({ email });
+    if (existingUserByEmail) {
+      return res.status(400).json({ message: "Email is already taken" });
     }
   }
 
+  if (userType === 'general' && email) {
+    const existingUserByEmail = await User.findOne({ email });
+    if (existingUserByEmail) {
+      return res.status(400).json({ message: "Email is already taken" });
+    }
+  }
+  let newUser
+  try {
 
-  // Create the user
-  const user = await User.create({
-    name,
-    email,
-    password,
-  });
-
-  console.log("create user :>> ", user)
-  // Respond with the user data and token
-  if (user) {
-    generateToken(res, user._id);
-
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
+    newUser = new User({
+      name,
+      email: userType === 'general' && !email ? null : email,
+      password,
+      role: userType,
     });
-  } else {
-    res.status(400);
-    throw new Error("Invalid user data");
+
+    await newUser.save();
+
+    if (userType === 'fellow') {
+      const verificationToken = JWT_TOKEN(newUser._id);
+      newUser.verificationToken = verificationToken;
+      await newUser.save();
+
+      const { Resend_API } = process.env;
+      const resend = new Resend(Resend_API);
+
+      const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
+      try {
+        let result = await resend.emails.send({
+          from: process.env.ADMIN_EMAIL ?? "your-email@example.com",
+          to: email,
+          subject: "Verify Your Email",
+          html: `
+            <p>Click the button below to verify your email:</p>
+            <button>
+              <a href="${verificationUrl}" style="text-decoration: none; color: white; background-color: #007bff;">Verify Email</a>
+            </button>
+            <p>If you did not request this, please ignore this email.</p>
+          `,
+        });
+        if (result?.data) {
+          return res.status(201).json({
+            message: 'User registered successfully. Please check your email for the verification link.',
+          });
+        } else {
+          if (newUser && newUser._id) {
+            await User.findByIdAndDelete(newUser._id);
+          }
+          throw new Error(result?.error?.message || 'Unknown email sending error');
+        }
+      } catch (error) {
+        if (newUser && newUser._id) {
+          await User.findByIdAndDelete(newUser._id);
+        }
+        return res.status(500).json({
+          message: error.message,
+
+        });
+      }
+    }
+    res.status(201).json({
+      message: 'User registered successfully.',
+    });
+  } catch (dbError) {
+    if (newUser && newUser._id) {
+      await User.findByIdAndDelete(newUser._id);
+    }
+    return res.status(500).json({
+      message: dbError.message,
+    });
+  }
+});
+
+// verifyEmailWithToken
+const verifyEmailWithToken = asyncHandler(async (req, res) => {
+  const { token } = req.body;
+  if (!token) {
+    return res.status(400).json({ message: 'Token is required' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    if (!decoded || !decoded.id) {
+      return res.status(400).json({ message: 'Invalid token' });
+    }
+    const existingUser = await User.findById(decoded.id)
+    if (!existingUser) {
+      return res.status(404).json({ message: "The User not found" })
+    }
+
+    if (existingUser.verificationToken !== token) {
+      return res.status(400).json({ message: 'Invalid or expired token' });
+    }
+    existingUser.isVerified = true;
+    existingUser.verificationToken = null;
+    await existingUser.save();
+
+    res.status(200).json({ message: 'Email successfully verified' });
+
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(400).json({ message: 'Token has expired, please request a new one' });
+    }
+    res.status(500).json({ message: 'Server error' });
+  }
+
+});
+
+// resend email verification link
+
+const resendVerificationToken = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const existingUser = await User.findOne({ email });
+
+    if (!existingUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    if (existingUser.isVerified) {
+      return res.status(400).json({ message: "User is already verified" });
+    }
+
+    const verificationToken = generateToken(existingUser._id);
+    existingUser.verificationToken = verificationToken;
+    await existingUser.save();
+
+    const { Resend_API } = process.env;
+    const resend = new Resend(Resend_API);
+
+    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
+    try {
+      const response = await resend.emails.send({
+        from: process.env.ADMIN_EMAIL ?? "dewqfinancehelp@resend.dev",
+        to: email,
+        subject: "Verify Your Email",
+        html: `
+                  <p>Click the button below to verify your email:</p>
+                  <button>
+                      <a href="${verificationUrl}" style="text-decoration: none; color: white; background-color: #007bff; padding: 10px 20px; border: none; border-radius: 5px;">Verify Email</a>
+                  </button>
+                  <p>If you did not request this, please ignore this email.</p>
+                  `,
+      });
+
+      res.status(200).json({
+        message: 'A new verification link has been sent to your email.',
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: 'Failed to resend verification email.',
+        error: error.message,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
@@ -269,5 +437,7 @@ export {
   resetPassword,
   Token,
   deleteUserAccount,
-  updateUserData
+  updateUserData,
+  verifyEmailWithToken,
+  resendVerificationToken
 };

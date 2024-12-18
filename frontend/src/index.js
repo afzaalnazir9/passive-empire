@@ -20,6 +20,7 @@ import Payment from "./screens/Subscription.jsx";
 import Checkout from "./screens/Checkout.jsx";
 import Notfound from "./NotFound.jsx";
 import LeaderBoard from "./screens/LeaderBoard.jsx";
+import EmailVerification from "./screens/EmailVerification.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -28,6 +29,7 @@ const router = createBrowserRouter(
       <Route path="/login" element={<LoginScreen />} />
       <Route path="/register" element={<RegisterScreen />} />
       <Route path="/games" element={<GamesList />} />
+      <Route path="/verify-email" element={<EmailVerification />} />
 
       <Route path="" element={<PrivateRoute />}>
         <Route path="/profile" element={<ProfileScreen />} />

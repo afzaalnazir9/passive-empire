@@ -11,7 +11,6 @@ const userSchema = mongoose.Schema(
     },
     email: {
       type: String,
-      required: true,
       unique: true,
     },
     password: {
@@ -31,11 +30,11 @@ const userSchema = mongoose.Schema(
         bundleId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Bundle',
-          required: true
+          required: true,
         },
         dateSubscribed: {
           type: Date,
-          default: Date.now
+          default: Date.now,
         },
         timesSubscribed: {
           type: Number,
@@ -45,20 +44,30 @@ const userSchema = mongoose.Schema(
           type: Number,
           default: 0,
         },
-      }
-    ]
+      },
+    ],
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+    },
+    role: {
+      type: String,
+      enum: ['fellow', 'general'],
+      default: 'general',
+    },
   },
   {
     timestamps: true,
   }
 );
 
-// Match user entered password to hashed password in database
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Encrypt password using bcrypt
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     next();

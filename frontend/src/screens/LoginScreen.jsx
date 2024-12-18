@@ -18,7 +18,7 @@ const LoginScreen = () => {
   const [validated, setValidated] = useState(false);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: "",
+    name: "",
     pass: "",
   });
 
@@ -30,30 +30,26 @@ const LoginScreen = () => {
 
   useEffect(() => {
     if (userInfo) {
-      navigate("/games"); // Redirect to the main game page after login
+      navigate("/games");
     }
   }, [navigate, userInfo]);
 
   const submitFn = async (event) => {
     event.preventDefault();
 
-    // Regular expression for email validation
-    const emailPattern = /^[\w.%+-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
 
-    // Check if form data is valid
     if (
-      emailPattern.test(formData.email) &&
-      formData.pass.length >= 3
+      formData.name &&
+      formData.pass
     ) {
       try {
         const res = await login({
-          email: formData.email,
+          name: formData.name,
           password: formData.pass,
         }).unwrap();
 
         dispatch(setCredentials({ ...res }));
       } catch (err) {
-        console.log("error", err);
         toast.error(err?.data?.message || err.error);
       }
     } else {
@@ -73,14 +69,12 @@ const LoginScreen = () => {
     <Grid
       container
       style={{
-        height: "100vh",
         backgroundColor: "#0080FF",
-        backgroundImage: "url('/images/background.png')", // Set background image
+        backgroundImage: "url('/images/background.png')",
         backgroundSize: "cover",
         backgroundPosition: "center"
       }}
     >
-      {/* Left Side */}
       <Grid
         item
         xs={12}
@@ -104,7 +98,6 @@ const LoginScreen = () => {
         />
       </Grid>
 
-      {/* Right Side */}
       <Grid
         item
         xs={12}
@@ -119,21 +112,16 @@ const LoginScreen = () => {
         >
 
           <TextField
-            id="email"
-            label="Email"
-            type="email"
-            name="email"
+            id="name"
+            label="name"
+            type="name"
+            name="name"
             value={formData.email}
             onChange={chngFn}
             required
             fullWidth
             margin="normal"
-            error={validated && !/^[\w.%+-]+@[\w.-]+\.[a-zA-Z]{2,}$/.test(formData.email)}
-            helperText={
-              validated && !/^[\w.%+-]+@[\w.-]+\.[a-zA-Z]{2,}$/.test(formData.email)
-                ? "Please enter a valid email address."
-                : ""
-            }
+
             variant="standard"
             slotProps={{
               input: {
@@ -146,30 +134,30 @@ const LoginScreen = () => {
             }}
             sx={{
               "& .MuiInputBase-root": {
-                color: "white", // Input text color
+                color: "white",
                 fontSize: "18px",
                 "&:before": {
-                  borderBottom: "1px solid white", // Default bottom border
+                  borderBottom: "1px solid white",
                 },
                 "&:hover:not(.Mui-disabled):before": {
-                  borderBottom: "1px solid white", // Bottom border when hovered
+                  borderBottom: "1px solid white",
                 },
                 "&.Mui-focused:before": {
-                  borderBottom: "1px solid white", // Bottom border when focused
+                  borderBottom: "1px solid white",
                 },
               },
               "& .MuiInputLabel-root": {
-                color: "white", // Label color
+                color: "white",
                 fontSize: "20px",
               },
               "& .MuiInputLabel-root.Mui-focused": {
-                color: "white", // Label color when focused
+                color: "white",
               },
               "& .MuiFormHelperText-root": {
-                color: "white", // Helper text color
+                color: "white",
               },
               "& .MuiInputAdornment-root .MuiSvgIcon-root": {
-                color: "white", // Icon color
+                color: "white",
               },
             }}
           />
@@ -202,69 +190,67 @@ const LoginScreen = () => {
             }}
             sx={{
               "& .MuiInputBase-root": {
-                color: "white", // Input text color
+                color: "white",
                 fontSize: "18px",
                 "&:before": {
-                  borderBottom: "1px solid white", // Default bottom border
+                  borderBottom: "1px solid white",
                 },
                 "&:hover:not(.Mui-disabled):before": {
-                  borderBottom: "1px solid white", // Bottom border when hovered
+                  borderBottom: "1px solid white",
                 },
                 "&.Mui-focused:before": {
-                  borderBottom: "1px solid white", // Bottom border when focused
+                  borderBottom: "1px solid white",
                 },
               },
               "& .MuiInputLabel-root": {
-                color: "white", // Label color
+                color: "white",
                 fontSize: "20px",
               },
               "& .MuiInputLabel-root.Mui-focused": {
-                color: "white", // Label color when focused
+                color: "white",
               },
               "& .MuiFormHelperText-root": {
-                color: "white", // Helper text color
+                color: "white",
               },
               "& .MuiInputAdornment-root .MuiSvgIcon-root": {
-                color: "white", // Icon color
+                color: "white",
               },
             }}
           />
 
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-            {/* Register Button */}
             <Button
               type="submit"
               variant="outlined"
               sx={{
-                borderRadius: "50px", // Fully rounded corners
-                padding: "10px 30px", // Adjust padding to suit your design
-                textTransform: "none", // Prevent uppercase text
+                borderRadius: "50px",
+                padding: "10px 30px",
+                textTransform: "none",
                 color: "white",
-                borderColor: "white", // White border
+                borderColor: "white",
                 fontSize: "20px",
                 "&:hover": {
-                  borderColor: "white", // Keep the border white on hover
-                  backgroundColor: "rgba(255, 255, 255, 0.1)", // Optional background change on hover
+                  borderColor: "white",
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
                 },
               }}
             >
               Login
             </Button>
 
-            {/* Play as Guest Button */}
             <Button
               onClick={() => navigate("/games")}
               variant="outlined"
               sx={{
-                borderRadius: "50px", // Fully rounded corners
-                padding: "10px 30px", // Adjust padding to suit your design
-                textTransform: "none", // Prevent uppercase text
+                borderRadius: "50px",
+                padding: "10px 30px",
+                textTransform: "none",
                 color: "white",
-                borderColor: "white", // White border
+                borderColor: "white",
                 fontSize: "20px",
                 "&:hover": {
-                  borderColor: "white", // Keep the border white on hover
-                  backgroundColor: "rgba(255, 255, 255, 0.1)", // Optional background change on hover
+                  borderColor: "white",
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
                 },
               }}
             >
@@ -272,7 +258,6 @@ const LoginScreen = () => {
             </Button>
           </Box>
 
-          {/* Link to register page */}
           <Box textAlign="center" marginTop={2}>
             <MuiLink component={Link} to="/register" sx={{ color: "white", fontSize: "20px" }}>
               Don't have an account? Register

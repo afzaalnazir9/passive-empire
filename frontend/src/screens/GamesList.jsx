@@ -22,7 +22,6 @@ function GamesList() {
 
   return (
     <Container sx={{ mt: 5 }}>
-      {/* Hero Image */}
       <Box sx={{ display: "flex", justifyContent: "center", mb: 5 }}>
         <img
           src="/images/fellow-game.png"
@@ -79,18 +78,16 @@ function GamesList() {
               }}
               onClick={() => handlePlayGame(game)}
             >
-              {/* Game Image */}
               <img
                 src={game.logo}
                 alt={game.title}
                 style={{
                   width: "100%",
                   height: "100%",
-                  objectFit: "cover",  // Ensure the image covers the card area
+                  objectFit: "cover",
                 }}
               />
 
-              {/* Title Box at Bottom */}
               <Box
                 sx={{
                   position: "absolute",
@@ -99,12 +96,9 @@ function GamesList() {
                   transform: "translateX(-50%)",
                   bgcolor: "white",
                   borderRadius: "50px",
-                  padding: "4px",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
                   boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.2)",
                   mb: 1,
+                  padding: "5px 5px 1px 5px"
                 }}
               >
                 <Typography
@@ -112,7 +106,7 @@ function GamesList() {
                   sx={{
                     fontWeight: "bold",
                     color: "#FFC128",
-                    fontSize: "18px"
+                    fontSize: "18px",
                   }}
                 >
                   {game.title}
@@ -123,7 +117,6 @@ function GamesList() {
         ))}
       </Swiper>
 
-      {/* Custom Pagination Dots */}
       <div
         className="swiper-pagination"
         style={{
@@ -134,7 +127,6 @@ function GamesList() {
         }}
       ></div>
 
-      {/* CSS for Pagination Dots */}
       <style>
         {`
           .swiper-pagination-bullet {

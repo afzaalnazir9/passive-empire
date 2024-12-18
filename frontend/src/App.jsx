@@ -2,63 +2,60 @@ import { Outlet } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "./components/Header";
 import { ToastContainer } from "react-toastify";
-import { useSelector } from "react-redux";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
 import "./App.css";
-
 const theme = createTheme({
   typography: {
-    fontFamily: "'Londrina Solid', sans-serif", // Apply font globally
+    fontFamily: "'Chilanka', sans-serif", // Apply 'Chilanka' font globally
     button: {
-      fontFamily: "'Londrina Solid', sans-serif", // Apply font to buttons
+      fontFamily: "'Chilanka', sans-serif", // Apply 'Chilanka' font to buttons
     },
     h1: {
-      fontFamily: "'Londrina Solid', sans-serif", // Apply font to h1 (headers)
+      fontFamily: "'Chilanka', sans-serif", // Apply 'Chilanka' font to h1 headers
     },
     h2: {
-      fontFamily: "'Londrina Solid', sans-serif", // Apply font to h2
+      fontFamily: "'Chilanka', sans-serif", // Apply 'Chilanka' font to h2 headers
     },
     body1: {
-      fontFamily: "'Londrina Solid', sans-serif", // Apply font to body text
+      fontFamily: "'Chilanka', sans-serif", // Apply 'Chilanka' font to body text
     },
-    // Apply to other typography styles if necessary (e.g., h3, body2, etc.)
+    // Update other typography styles as necessary (e.g., h3, body2, etc.)
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          fontFamily: "'Londrina Solid', sans-serif", // Override MUI Button globally
+          fontFamily: "'Chilanka', sans-serif",
         },
       },
     },
     MuiTextField: {
       styleOverrides: {
         root: {
-          fontFamily: "'Londrina Solid', sans-serif", // Override MUI TextField globally
+          fontFamily: "'Chilanka', sans-serif",
         },
       },
     },
     MuiTypography: {
       styleOverrides: {
         root: {
-          fontFamily: "'Londrina Solid', sans-serif", // Override MUI Typography globally
+          fontFamily: "'Chilanka', sans-serif",
         },
       },
     },
     MuiLink: {
       styleOverrides: {
         root: {
-          fontFamily: "'Londrina Solid', sans-serif", // Override MUI Link globally
+          fontFamily: "'Chilanka', sans-serif",
         },
       },
     },
-    // Override other components if necessary
   },
 });
 
+
 const App = () => {
-  const { userInfo } = useSelector((state) => state.auth);
 
   return (
     <ThemeProvider theme={theme}>

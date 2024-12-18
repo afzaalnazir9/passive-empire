@@ -13,10 +13,9 @@ const cardData = [
 const LeaderBoard = () => {
     return (
         <Container sx={{ mt: 5 }}>
-            {/* LeaderBoard Hero */}
             <Box sx={{ display: "flex", justifyContent: "center", mb: 5 }}>
                 <img
-                    src="/images/fellow-game.png" // Replace with a valid image path
+                    src="/images/fellow-game.png" 
                     alt="LeaderBoard"
                     style={{
                         width: "400px",
@@ -27,7 +26,6 @@ const LeaderBoard = () => {
                 />
             </Box>
 
-            {/* Grid for Cards */}
             <Grid container spacing={3}>
                 {cardData.map((card, index) => (
                     <Grid item xs={12} sm={4} key={index}>

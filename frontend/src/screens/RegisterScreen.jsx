@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -7,13 +7,16 @@ import {
   Grid,
   CircularProgress,
   InputAdornment,
+  FormControl,
+  RadioGroup,
+  FormLabel,
+  Radio,
+  FormControlLabel,
   Link as MuiLink,
 } from "@mui/material";
 import { AccountCircle, Email, Lock } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import { useRegisterMutation } from "../slices/usersApiSlice";
-import { setCredentials } from "../slices/authSlice";
 import { toast } from "react-toastify";
 
 const RegisterScreen = () => {
@@ -23,49 +26,72 @@ const RegisterScreen = () => {
     pass: "",
     confimPass: "",
     email: "",
+    userType: "general",
   });
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [register, { isLoading }] = useRegisterMutation();
 
-  const { userInfo } = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    if (userInfo) {
-      navigate("/games");
-    }
-  }, [navigate, userInfo]);
 
   const submitFn = async (event) => {
-    event.preventDefault();
+    if (formData.email) {
+      event.preventDefault();
 
-    // Regular expression for email validation
-    const emailPattern = /^[\w.%+-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
+      const emailPattern = /^[\w.%+-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
 
-    // Check if form data is valid
-    if (
-      formData.name &&
-      emailPattern.test(formData.email) &&
-      formData.pass.length >= 3 &&
-      formData.pass === formData.confimPass
-    ) {
-      try {
-        const res = await register({
-          name: formData.name,
-          email: formData.email,
-          password: formData.pass,
-        }).unwrap();
-
-        dispatch(setCredentials({ ...res }));
-      } catch (err) {
-        console.log("error", err);
-        toast.error(err?.data?.message || err.error);
+      if (
+        formData.name &&
+        emailPattern.test(formData.email) &&
+        formData.pass.length >= 3 &&
+        formData.pass === formData.confimPass
+      ) {
+        try {
+          await register({
+            name: formData.name,
+            email: formData.email,
+            password: formData.pass,
+            userType: formData.userType,
+          }).unwrap();
+          toast.success("Registration successful! Redirecting to login...");
+          setTimeout(() => {
+            navigate("/login");
+          }, 2000);
+        } catch (err) {
+          toast.error(err?.data?.message || err.error);
+        }
+      } else {
+        setValidated(true);
       }
     } else {
-      setValidated(true);
+      event.preventDefault();
+
+
+      if (
+        formData.name &&
+        formData.pass.length >= 3 &&
+        formData.pass === formData.confimPass
+      ) {
+        try {
+          const res = await register({
+            name: formData.name,
+            email: null,
+            password: formData.pass,
+            userType: formData.userType,
+          }).unwrap();
+          toast.success("Registration successful! Redirecting to login...");
+          setTimeout(() => {
+            navigate("/login");
+          }, 2000);
+        } catch (err) {
+          toast.error(err?.data?.message || err.error);
+        }
+      } else {
+        setValidated(true);
+      }
     }
+
+
   };
 
 
@@ -78,8 +104,7 @@ const RegisterScreen = () => {
   };
 
   return (
-    <Grid container style={{ height: "100vh", backgroundColor: "#0080FF", backgroundImage: "url('/images/background.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
-      {/* Left Side */}
+    <Grid container style={{ backgroundColor: "#0080FF", backgroundImage: "url('/images/background.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
       <Grid
         item
         xs={12}
@@ -103,7 +128,6 @@ const RegisterScreen = () => {
         />
       </Grid>
 
-      {/* Right Side */}
       <Grid
         item
         xs={12}
@@ -123,15 +147,15 @@ const RegisterScreen = () => {
             width: 400,
             p: 4,
             borderRadius: 2,
-            position: "relative", // Ensure the form is positioned above the background
-            backdropFilter: "blur(5px)", // Optional: adds a slight blur effect to the background
+            position: "relative",
+            backdropFilter: "blur(5px)",
           }}
         >
           <Typography
             variant="h4"
             gutterBottom
             textAlign="center"
-            sx={{ color: "#FFFFFF", fontFamily: "Londrina Solid, sans-serif" }}
+            sx={{ color: "#FFFFFF",}}
           >
             Registration :
           </Typography>
@@ -161,30 +185,30 @@ const RegisterScreen = () => {
             }}
             sx={{
               "& .MuiInputBase-root": {
-                color: "white", // Input text color
+                color: "white",
                 fontSize: "18px",
                 "&:before": {
-                  borderBottom: "1px solid white", // Default bottom border
+                  borderBottom: "1px solid white",
                 },
                 "&:hover:not(.Mui-disabled):before": {
-                  borderBottom: "1px solid white", // Bottom border when hovered
+                  borderBottom: "1px solid white",
                 },
                 "&.Mui-focused:before": {
-                  borderBottom: "1px solid white", // Bottom border when focused
+                  borderBottom: "1px solid white",
                 },
               },
               "& .MuiInputLabel-root": {
-                color: "white", // Label color
-                fontSize: "20px", // Increased label font size
+                color: "white",
+                fontSize: "20px",
               },
               "& .MuiInputLabel-root.Mui-focused": {
-                color: "white", // Label color when focused
+                color: "white",
               },
               "& .MuiFormHelperText-root": {
-                color: "white", // Helper text color
+                color: "white",
               },
               "& .MuiInputAdornment-root .MuiSvgIcon-root": {
-                color: "white", // Icon color
+                color: "white",
               },
             }}
           />
@@ -196,15 +220,10 @@ const RegisterScreen = () => {
             name="email"
             value={formData.email}
             onChange={chngFn}
-            required
+
             fullWidth
             margin="normal"
-            error={validated && !/^[\w.%+-]+@[\w.-]+\.[a-zA-Z]{2,}$/.test(formData.email)}
-            helperText={
-              validated && !/^[\w.%+-]+@[\w.-]+\.[a-zA-Z]{2,}$/.test(formData.email)
-                ? "Please enter a valid email address."
-                : ""
-            }
+
             variant="standard"
             slotProps={{
               input: {
@@ -357,41 +376,94 @@ const RegisterScreen = () => {
             }}
           />
 
+
+          <FormControl fullWidth margin="normal">
+            <RadioGroup
+              name="userType"
+              value={formData.userType}
+              onChange={chngFn}
+              row
+            >
+              <FormControlLabel
+                value="general"
+                control={
+                  <Radio
+                    sx={{
+                      '&.Mui-checked': {
+                        color: 'white',
+                      },
+                      '& .MuiSvgIcon-root': {
+                        color: 'white',
+                      }
+                    }}
+                  />
+                }
+                label="General User"
+                sx={{
+                  color: 'white',
+                  '&.Mui-checked': {
+                    color: 'white',
+                  }
+                }}
+              />
+              <FormControlLabel
+                value="fellow"
+                control={
+                  <Radio
+                    sx={{
+                      '&.Mui-checked': {
+                        color: 'white',
+                      },
+                      '& .MuiSvgIcon-root': {
+                        color: 'white',
+                      }
+                    }}
+                  />
+                }
+                label="Fellow User"
+                sx={{
+                  color: 'white',
+                  '&.Mui-checked': {
+                    color: 'white',
+                  }
+                }}
+              />
+            </RadioGroup> 
+          </FormControl>
+
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-            {/* Register Button */}
             <Button
               type="submit"
               variant="outlined"
               sx={{
-                borderRadius: "50px", // Fully rounded corners
-                padding: "10px 30px", // Adjust padding to suit your design
-                textTransform: "none", // Prevent uppercase text
+                borderRadius: "50px",
+                padding: "10px 30px",
+                textTransform: "none",
                 color: "white",
-                borderColor: "white", // White border
+                borderColor: "white",
                 fontSize: "20px",
                 "&:hover": {
-                  borderColor: "white", // Keep the border white on hover
-                  backgroundColor: "rgba(255, 255, 255, 0.1)", // Optional background change on hover
+                  borderColor: "white",
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
                 },
               }}
             >
               {isLoading ? <CircularProgress size={24} /> : "Register"}
             </Button>
 
-            {/* Play as Guest Button */}
             <Button
               variant="outlined"
               onClick={() => navigate("/games")}
               sx={{
-                borderRadius: "50px", // Fully rounded corners
-                padding: "10px 30px", // Adjust padding to suit your design
-                textTransform: "none", // Prevent uppercase text
+                borderRadius: "50px",
+                padding: "10px 30px",
+                textTransform: "none",
                 color: "white",
-                borderColor: "white", // White border
+                borderColor: "white",
                 fontSize: "20px",
                 "&:hover": {
-                  borderColor: "white", // Keep the border white on hover
-                  backgroundColor: "rgba(255, 255, 255, 0.1)", // Optional background change on hover
+                  borderColor: "white",
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
                 },
               }}
             >
