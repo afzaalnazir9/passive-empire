@@ -68,9 +68,10 @@ const Token = asyncHandler(async (req, res) => {
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
-  console.log(password)
+  console.log(name, email)
 
   const existingUser = await User.findOne({ $or: [{ name }, { email }] });
+  console.log("existingUser :>> ", existingUser)
   if (existingUser) {
     if (existingUser.name === name && existingUser.email === email) {
       res.status(400);
@@ -92,6 +93,7 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
   });
 
+  console.log("create user :>> ", user)
   // Respond with the user data and token
   if (user) {
     generateToken(res, user._id);

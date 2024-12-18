@@ -12,7 +12,10 @@ import bundleRoutes from "./routes/bundleRoutes.js"
 import logger from "morgan"
 import path from "path"
 
+const app = express();
+
 const port = process.env.PORT || 5000;
+console.log("server db uri :>> ", process.env.MONGO_URI, process.env.FRONTEND_URL, process.env.PORT);
 
 const connectToDatabase = async () => {
   try {
@@ -23,14 +26,14 @@ const connectToDatabase = async () => {
   }
 };
 
-const app = express();
-
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: ["https://fellowsgames.com", "http://localhost:3000"],
     credentials: true,
   })
 );
+
+
 app.use(logger("dev"))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
