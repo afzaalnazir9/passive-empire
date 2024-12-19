@@ -28,7 +28,7 @@ function GamesList() {
           alt="Fellow Games"
           style={{
             width: "400px",
-            height: "200px",
+            height: "195px",
             borderRadius: "8px",
             objectFit: "cover",
           }}
@@ -87,31 +87,27 @@ function GamesList() {
                   objectFit: "cover",
                 }}
               />
+            </Box>
 
-              <Box
+            <Box sx={{ textAlign: "center", mt: 1 }}
+              onClick={() => handlePlayGame(game)}
+            >
+              <Typography
+                variant="subtitle1"
                 sx={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  bgcolor: "white",
-                  borderRadius: "50px",
-                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.2)",
-                  mb: 1,
-                  padding: "5px 5px 1px 5px"
+                  fontWeight: "bold",
+                  color: "white",
+                  fontSize: "23px",
+                  cursor: "pointer",
+                  "&:hover": {
+                    transform: "scale(1.02)",
+                    transition: "transform 0.2s ease-in-out",
+                    color: "#FFC128"
+                  },
                 }}
               >
-                <Typography
-                  variant="subtitle1"
-                  sx={{
-                    fontWeight: "bold",
-                    color: "#FFC128",
-                    fontSize: "18px",
-                  }}
-                >
-                  {game.title}
-                </Typography>
-              </Box>
+                {game.title}
+              </Typography>
             </Box>
           </SwiperSlide>
         ))}
@@ -123,7 +119,7 @@ function GamesList() {
           textAlign: "center",
           position: "relative",
           zIndex: "10",
-          bottom: "-30px",
+          bottom: "-2px",
         }}
       ></div>
 

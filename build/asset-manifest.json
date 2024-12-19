@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/static/css/main.b80d0aa6.css",
-    "main.js": "/static/js/main.03ff2f4a.js",
+    "main.js": "/static/js/main.0e311e8f.js",
     "static/media/background.png": "/static/media/background.64c9c08d33c48afe973c.png",
     "static/media/Chilanka-Regular.ttf": "/static/media/Chilanka-Regular.bd162ef898aceaae59c0.ttf",
     "index.html": "/index.html",
     "main.b80d0aa6.css.map": "/static/css/main.b80d0aa6.css.map",
-    "main.03ff2f4a.js.map": "/static/js/main.03ff2f4a.js.map"
+    "main.0e311e8f.js.map": "/static/js/main.0e311e8f.js.map"
   },
   "entrypoints": [
     "static/css/main.b80d0aa6.css",
-    "static/js/main.03ff2f4a.js"
+    "static/js/main.0e311e8f.js"
   ]
 }
