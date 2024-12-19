@@ -1,50 +1,34 @@
 import multer from "multer";
-import path from "path";
-import fs from "fs";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import multerS3 from "multer-s3";
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-
-        let uploadPath;
-
-        if (file.originalname.endsWith('.loader.js') || file.fieldname === 'web_build_loader') {
-            uploadPath = "uploads/builds/web/";
-        } else if (file.fieldname === "logo") {
-            uploadPath = "uploads/logos/";
-        } else if (file.fieldname === "mobile_build") {
-            uploadPath = "uploads/builds/mobile/";
-        } else if (
-            file.fieldname === "web_build_framework" ||
-            file.fieldname === "web_build_wasm" ||
-            file.fieldname === "web_build_data"
-        ) {
-            uploadPath = "uploads/builds/web/";
-        } else {
-            uploadPath = "uploads/";
-        }
-
-        try {
-            fs.mkdirSync(uploadPath, { recursive: true });
-        } catch (err) {
-            console.error("Error creating directory:", err);
-        }
-        cb(null, uploadPath);
+const s3 = new S3Client({
+    region: process.env.AWS_REGION, 
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID, 
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname);
-    }
 });
 
-const fileFilter = (req, file, cb) => {
-    cb(null, true);
-};
-
 const upload = multer({
-    storage: storage,
-    fileFilter: fileFilter,
+    storage: multerS3({
+        s3: s3,
+        bucket: process.env.S3_BUCKET_NAME, 
+        metadata: (req, file, cb) => {
+            cb(null, { fieldName: file.fieldname });
+        },
+        key: (req, file, cb) => {
+            let folder = "";
+            if (file.fieldname === "logo") folder = "logos/";
+            else if (file.fieldname === "mobile_build") folder = "builds/mobile/";
+            else folder = "builds/web/";
+
+            cb(null, `${folder}${Date.now()}_${file.originalname}`);
+        },
+    }),
     limits: {
-        fileSize: 100 * 1024 * 1024
-    }
+        fileSize: 500 * 1024 * 1024, 
+    },
 });
 
 export default upload;

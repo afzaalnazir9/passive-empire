@@ -5,72 +5,35 @@ import path from 'path';
 const createGame = async (req, res) => {
     const { title, description } = req.body;
 
-    const logo = req.files?.['logo']?.[0]?.filename || null;
-    const mobile_build = req.files?.['mobile_build']?.[0]?.filename || null;
-    const web_build_framework = req.files?.['web_build_framework']?.[0]?.filename || null;
-    const web_build_wasm = req.files?.['web_build_wasm']?.[0]?.filename || null;
-    const web_build_loader = req.files?.['web_build_loader']?.[0]?.filename || null;
-    const web_build_data = req.files?.['web_build_data']?.[0]?.filename || null;
-
-    const deleteFileIfExists = (filePath) => {
-        if (filePath && fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-        }
-    };
+    const logo = req.files?.['logo']?.[0]?.location || null;
+    const mobile_build = req.files?.['mobile_build']?.[0]?.location || null;
+    const web_build_framework = req.files?.['web_build_framework']?.[0]?.location || null;
+    const web_build_wasm = req.files?.['web_build_wasm']?.[0]?.location || null;
+    const web_build_loader = req.files?.['web_build_loader']?.[0]?.location || null;
+    const web_build_data = req.files?.['web_build_data']?.[0]?.location || null;
 
     if (!title || title.trim() === "") {
-        if (logo) deleteFileIfExists(path.join('uploads/logos', logo));
-        if (mobile_build) deleteFileIfExists(path.join('uploads/builds/mobile', mobile_build));
-        if (web_build_framework) deleteFileIfExists(path.join('uploads/builds/web/framework', web_build_framework));
-        if (web_build_wasm) deleteFileIfExists(path.join('uploads/builds/web/wasm', web_build_wasm));
-        if (web_build_loader) deleteFileIfExists(path.join('uploads/builds/web/loader', web_build_loader));
-        if (web_build_data) deleteFileIfExists(path.join('uploads/builds/web/data', web_build_data));
-
         return res.status(400).json({ message: "Title is required and cannot be empty." });
     }
 
     try {
-        const baseUrl = process.env.FILE_UPLOAD_BASE_URL;
-        const logoUrl = logo ? `${baseUrl}/uploads/logos/${logo}` : null;
-        const mobileBuildUrl = mobile_build ? `${baseUrl}/uploads/builds/mobile/${mobile_build}` : null;
-        const webBuildFrameworkUrl = web_build_framework ? `${baseUrl}/uploads/builds/web/${web_build_framework}` : null;
-        const webBuildWasmUrl = web_build_wasm ? `${baseUrl}/uploads/builds/web/${web_build_wasm}` : null;
-        const webBuildLoaderUrl = web_build_loader ? `${baseUrl}/uploads/builds/web/${web_build_loader}` : null;
-        const webBuildDataUrl = web_build_data ? `${baseUrl}/uploads/builds/web/${web_build_data}` : null;
-
         const game = await Games.create({
             title,
             description,
-            logo: logoUrl,
-            mobile_build: mobileBuildUrl,
-            web_build_framework: webBuildFrameworkUrl,
-            web_build_wasm: webBuildWasmUrl,
-            web_build_loader: webBuildLoaderUrl,
-            web_build_data: webBuildDataUrl
+            logo,
+            mobile_build,
+            web_build_framework,
+            web_build_wasm,
+            web_build_loader,
+            web_build_data,
         });
 
-        res.status(201).json({
-            _id: game._id,
-            title: game.title,
-            description: game.description,
-            logo: game.logo,
-            mobile_build: game.mobile_build,
-            web_build_framework: game.web_build_framework,
-            web_build_wasm: game.web_build_wasm,
-            web_build_loader: game.web_build_loader,
-            web_build_data: game.web_build_data
-        });
+        res.status(201).json(game);
     } catch (error) {
-        if (logo) deleteFileIfExists(path.join('uploads/logos', logo));
-        if (mobile_build) deleteFileIfExists(path.join('uploads/builds/mobile', mobile_build));
-        if (web_build_framework) deleteFileIfExists(path.join('uploads/builds/web/framework', web_build_framework));
-        if (web_build_wasm) deleteFileIfExists(path.join('uploads/builds/web/wasm', web_build_wasm));
-        if (web_build_loader) deleteFileIfExists(path.join('uploads/builds/web/loader', web_build_loader));
-        if (web_build_data) deleteFileIfExists(path.join('uploads/builds/web/data', web_build_data));
-
         res.status(500).json({ message: "Failed to create game", error: error.message });
     }
 };
+
 
 const displayAllGames = async (req, res) => {
     try {

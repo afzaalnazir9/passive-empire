@@ -37,7 +37,7 @@ const Header = () => {
       setActiveButton("games");
     } else if (location.pathname === "/profile") {
       setActiveButton("profile");
-    } else if (location.pathname === "/products") {
+    } else if (location.pathname === "/store") {
       setActiveButton("products");
     } else if (location.pathname === "/leaderboard") {
       setActiveButton("leaderboard");
@@ -99,7 +99,7 @@ const Header = () => {
               </Button>
               <Button
                 color="inherit"
-                onClick={() => { navigate("/products"); setActiveButton("products"); }}
+                onClick={() => { navigate("/store"); setActiveButton("products"); }}
                 sx={{ fontSize: '1.5rem', fontWeight: "bold" }}
                 style={activeButton === "products" ? activeTextStyle : defaultTextStyle}
               >

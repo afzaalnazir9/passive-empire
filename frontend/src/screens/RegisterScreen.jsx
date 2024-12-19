@@ -215,7 +215,7 @@ const RegisterScreen = () => {
 
           <TextField
             id="input-with-icon-textfield"
-            label="Email"
+            label={`Email ${formData.userType === "fellow" ? "(Mandatory)" : "(Optional)"}`}
             type="email"
             name="email"
             value={formData.email}
