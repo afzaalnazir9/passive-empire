@@ -1,14 +1,19 @@
 const notFound = (req, res, next) => {
-  const error = new Error(`Not Found - ${req.originalUrl}`);
+  const error = new Error(`Not Found - ${req.originalUrl}`); // Corrected string interpolation
   res.status(404);
   next(error);
 };
 
 const errorHandler = (err, req, res, next) => {
+  // Check if headers are already sent
+  if (res.headersSent) {
+    return next(err); // Delegate to the default Express error handler
+  }
+
   let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   let message = err.message;
 
-  // If Mongoose not found error, set to 404 and change message
+  // Handle specific errors
   if (err.name === 'CastError' && err.kind === 'ObjectId') {
     statusCode = 404;
     message = 'Resource not found';
@@ -21,3 +26,4 @@ const errorHandler = (err, req, res, next) => {
 };
 
 export { notFound, errorHandler };
+
