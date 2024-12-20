@@ -17,7 +17,6 @@ import GamesList from "./screens/GamesList.jsx";
 import PrivateRoute from "./components/PrivateRoute.jsx";
 import Home from "./screens/Home.jsx";
 import Payment from "./screens/Subscription.jsx";
-import Checkout from "./screens/Checkout.jsx";
 import Notfound from "./NotFound.jsx";
 import LeaderBoard from "./screens/LeaderBoard.jsx";
 import EmailVerification from "./screens/EmailVerification.jsx";
@@ -35,7 +34,6 @@ const router = createBrowserRouter(
         <Route path="/profile" element={<ProfileScreen />} />
         <Route path="/leaderboard" element={<LeaderBoard />} />
         <Route path="/store" element={<Payment />} />
-        <Route path="/checkout" element={<Checkout />} />
         <Route path="*" element={<Notfound />} />
       </Route>
     </Route>

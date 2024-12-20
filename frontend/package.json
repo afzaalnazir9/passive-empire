@@ -10,8 +10,6 @@
     "@mui/icons-material": "^6.2.0",
     "@mui/material": "^6.2.0",
     "@reduxjs/toolkit": "^2.2.1",
-    "@stripe/react-stripe-js": "^2.1.1",
-    "@stripe/stripe-js": "^1.54.2",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
