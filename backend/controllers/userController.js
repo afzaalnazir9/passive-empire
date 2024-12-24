@@ -147,7 +147,7 @@ const registerUser = asyncHandler(async (req, res) => {
       const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
       try {
         let result = await resend.emails.send({
-          from: process.env.ADMIN_EMAIL ?? "your-email@example.com",
+          from: process.env.ADMIN_EMAIL,
           to: email,
           subject: "Verify Your Email",
           html: `
